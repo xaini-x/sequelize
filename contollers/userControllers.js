@@ -89,9 +89,7 @@ const findUser = async (req, res) => {
 const findAll = async (req, res) => {
     try {
         const nameSearch = req.params.nameSearch;
-        const user = await User.findAll({
-            // attributes: ['firstName', [db.sequelize.fn('COUNT', db.Sequelize.col('firstName')), 'count']],
-          attributes:['email'],
+        const user = await User.findAll({  attributes: ['email'],
             where: {
                 firstName: nameSearch
             }
@@ -110,9 +108,40 @@ const findAll = async (req, res) => {
         })
     }
 }
-const userCount = async (req, res) => {
-
+const exinclude = async (req, res) => {
+const all = await User.findAll({ attributes:{exclude:['createdAt', 'updatedAt']}
+})
+return res.status(200).json({"success": all});
 
 }
 
-module.exports = { addUser, updateUser, findUser, findAll };
+const operand = async (req, res) => {
+    const eq = await User.findAll({ 
+where: {
+    id:{
+        [Op.eq]:2
+    }
+}
+    })
+    const gt = await User.findAll({ 
+        where: {
+            id:{
+                [Op.gt]:2
+            }
+        }
+            })
+
+            const like = await User.findAll({ 
+                where: {
+                    email:{
+                        [Op.like]:"%@example.com%"
+                    },
+                 
+                },
+                attributes:['email']
+                    })
+    return res.status(200).json({"eq": eq,"gt": gt, "like": like});
+    
+    }
+
+module.exports = {exinclude, addUser, updateUser, findUser, findAll ,operand};
